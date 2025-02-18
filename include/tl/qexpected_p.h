@@ -16,14 +16,31 @@
 #ifndef TL_EXPECTED_HPP
 #define TL_EXPECTED_HPP
 
+//
+//  W A R N I N G
+//  -------------
+//
+// This file is not part of the Qt API.  It exists purely as an
+// implementation detail.  This header file may change from version to
+// version without notice, or even be removed.
+//
+// We mean it.
+//
+
 #define TL_EXPECTED_VERSION_MAJOR 1
 #define TL_EXPECTED_VERSION_MINOR 1
 #define TL_EXPECTED_VERSION_PATCH 0
+
+#include <QtCore/private/qglobal_p.h>
+#include <QtCore/qassert.h>
+#include <QtCore/qtconfigmacros.h>
 
 #include <exception>
 #include <functional>
 #include <type_traits>
 #include <utility>
+
+#define TL_ASSERT Q_ASSERT
 
 #if defined(__EXCEPTIONS) || defined(_CPPUNWIND)
 #define TL_EXPECTED_EXCEPTIONS_ENABLED
@@ -81,7 +98,8 @@
 #elif (defined(__GNUC__) && __GNUC__ < 8 && !defined(__clang__))
 #ifndef TL_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
 #define TL_GCC_LESS_8_TRIVIALLY_COPY_CONSTRUCTIBLE_MUTEX
-namespace tl {
+QT_BEGIN_NAMESPACE
+namespace q23 {
 namespace detail {
 template <class T>
 struct is_trivially_copy_constructible
@@ -91,11 +109,12 @@ template <class T, class A>
 struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
 #endif
 } // namespace detail
-} // namespace tl
+} // namespace q23
+QT_END_NAMESPACE
 #endif
 
 #define TL_EXPECTED_IS_TRIVIALLY_COPY_CONSTRUCTIBLE(T)                         \
-  tl::detail::is_trivially_copy_constructible<T>
+  q23::detail::is_trivially_copy_constructible<T>
 #define TL_EXPECTED_IS_TRIVIALLY_COPY_ASSIGNABLE(T)                            \
   std::is_trivially_copy_assignable<T>
 #define TL_EXPECTED_IS_TRIVIALLY_DESTRUCTIBLE(T)                               \
@@ -132,7 +151,8 @@ struct is_trivially_copy_constructible<std::vector<T, A>> : std::false_type {};
 #define TL_EXPECTED_11_CONSTEXPR constexpr
 #endif
 
-namespace tl {
+QT_BEGIN_NAMESPACE
+namespace q23 {
 template <class T, class E> class expected;
 
 #ifndef TL_MONOSTATE_INPLACE_MUTEX
@@ -396,7 +416,7 @@ struct is_nothrow_swappable
 #endif
 #endif
 
-// Trait for checking if a type is a tl::expected
+// Trait for checking if a type is a q23::expected
 template <class T> struct is_expected_impl : std::false_type {};
 template <class T, class E>
 struct is_expected_impl<expected<T, E>> : std::true_type {};
@@ -2474,6 +2494,7 @@ void swap(expected<T, E> &lhs,
           expected<T, E> &rhs) noexcept(noexcept(lhs.swap(rhs))) {
   lhs.swap(rhs);
 }
-} // namespace tl
+} // namespace q23
+QT_END_NAMESPACE
 
 #endif
